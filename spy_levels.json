@@ -1,0 +1,223 @@
+{
+  "spy_levels": {
+    "last_updated": "2026-04-24",
+    "current_price": 709.74,
+    "timeframe": "1H",
+
+    "resistance_levels": [
+      {
+        "price": 713.05,
+        "label": "Weak High 2% — ATH zone",
+        "type": "resistance",
+        "alert": "🔴 SPY hit WEAK HIGH at $713.05 — 2% above resistance. HIGH PROBABILITY REJECTION ZONE. Watch for reversal candle. Put entry on confirmation.",
+        "action": "SELL / PUT ENTRY"
+      },
+      {
+        "price": 712.92,
+        "label": "Major Resistance / Double Top Level",
+        "type": "resistance",
+        "alert": "🔴 SPY at $712.92 — MAJOR RESISTANCE. Double top level. This is the line in the sand. Rejection here confirms bearish thesis.",
+        "action": "WATCH FOR REJECTION"
+      },
+      {
+        "price": 712.48,
+        "label": "Ascending Triangle Breakout Level",
+        "type": "resistance",
+        "alert": "⚠️ SPY testing $712.48 — Ascending Triangle resistance. Break above with volume = bullish continuation to $715+. Rejection = puts activate.",
+        "action": "DECISION POINT"
+      },
+      {
+        "price": 711.87,
+        "label": "Order Block / Supply Zone",
+        "type": "resistance",
+        "alert": "🔴 SPY at $711.87 order block. 351.847K contracts at this level (40.39% volume node). Strong institutional supply here.",
+        "action": "MONITOR"
+      },
+      {
+        "price": 711.59,
+        "label": "Inner Range High",
+        "type": "resistance",
+        "alert": "🟡 SPY at $711.59 inner resistance. Watch for reaction.",
+        "action": "MONITOR"
+      },
+      {
+        "price": 711.28,
+        "label": "Volume Node — 572K contracts (32.47%)",
+        "type": "resistance",
+        "alert": "🔴 SPY at $711.28 — Heavy volume cluster 572K contracts (32.47%). Institutional supply zone active.",
+        "action": "WATCH"
+      },
+      {
+        "price": 713.35,
+        "label": "Premarket High",
+        "type": "resistance",
+        "alert": "🔴 SPY hit PREMARKET HIGH at $713.35. Above this = new territory. Below this = fakeout confirmed. Critical level for morning session.",
+        "action": "CALL EXIT / PUT ENTRY"
+      },
+      {
+        "price": 711.19,
+        "label": "Premarket High 2",
+        "type": "resistance",
+        "alert": "🟡 SPY at second premarket high $711.19. Consolidation zone between $711.19 and $713.35.",
+        "action": "MONITOR"
+      }
+    ],
+
+    "support_levels": [
+      {
+        "price": 710.68,
+        "label": "Volume Node — 947K contracts (30.1%)",
+        "type": "support",
+        "alert": "🟡 SPY at $710.68 — 947K contract volume node (30.1%). Key intraday pivot. Hold = bullish. Break = bearish acceleration.",
+        "action": "WATCH"
+      },
+      {
+        "price": 710.09,
+        "label": "INININ / DWMQ Level — 3.008B USD (11.81%)",
+        "type": "support",
+        "alert": "🟡 SPY at $710.09 — Daily/Weekly/Monthly/Quarterly confluence. $3B in liquidity at this level. MAJOR decision point.",
+        "action": "HIGH PRIORITY WATCH"
+      },
+      {
+        "price": 709.74,
+        "label": "Current Price / Equilibrium Zone",
+        "type": "support",
+        "alert": "📍 SPY at $709.74 — Equilibrium. Balanced between buyers and sellers. Waiting for directional catalyst.",
+        "action": "NEUTRAL"
+      },
+      {
+        "price": 709.05,
+        "label": "Premarket Support / Inside Bar Level",
+        "type": "support",
+        "alert": "🟡 SPY at $709.05 premarket support. Inside Bar forming — breakout imminent. Direction of break = direction of move.",
+        "action": "BREAKOUT WATCH"
+      },
+      {
+        "price": 709.02,
+        "label": "Major Liquidity Node — 6.639B USD (11.7%)",
+        "type": "support",
+        "alert": "🟢 SPY at $709.02 — MASSIVE $6.639B liquidity pool (11.7%). This is where big money defends. Strong bounce expected here.",
+        "action": "CALL ENTRY ON BOUNCE"
+      },
+      {
+        "price": 708.44,
+        "label": "Overnight Low / Key Support",
+        "type": "support",
+        "alert": "🔴 SPY broke to $708.44 overnight low. Bulls need to reclaim immediately. Failure here = $707 next.",
+        "action": "CRITICAL SUPPORT"
+      },
+      {
+        "price": 708.14,
+        "label": "Premarket Low 1",
+        "type": "support",
+        "alert": "🔴 SPY at premarket low $708.14. Break below = bearish open confirmed.",
+        "action": "WATCH"
+      },
+      {
+        "price": 707.72,
+        "label": "Equilibrium — 1.87B USD (7.37%)",
+        "type": "support",
+        "alert": "🟡 SPY at $707.72 equilibrium level. $1.87B in liquidity. Mid-range support.",
+        "action": "WATCH"
+      },
+      {
+        "price": 707.28,
+        "label": "Volume Node — 4.838B USD (8.55%)",
+        "type": "support",
+        "alert": "🟢 SPY at $707.28 — $4.838B USD volume node (8.55%). Significant institutional support.",
+        "action": "BOUNCE WATCH"
+      },
+      {
+        "price": 707.14,
+        "label": "Premarket Low 2",
+        "type": "support",
+        "alert": "🔴 SPY at second premarket low $707.14. Break here opens gap to $706.50.",
+        "action": "WATCH"
+      },
+      {
+        "price": 706.53,
+        "label": "Volume Node — 1.527B USD (6.03%)",
+        "type": "support",
+        "alert": "🔴 SPY at $706.53 support. $1.527B volume node. Last line before $705 gap fill.",
+        "action": "WATCH"
+      },
+      {
+        "price": 705.94,
+        "label": "Minor Support",
+        "type": "support",
+        "alert": "🔴 SPY at $705.94. Approaching $705 round number support.",
+        "action": "WATCH"
+      },
+      {
+        "price": 705.55,
+        "label": "Deep Support — 2.125B USD (3.76%)",
+        "type": "support",
+        "alert": "🟢 SPY at $705.55 — $2.125B deep liquidity. Strong buyers expected here.",
+        "action": "CALL ENTRY ZONE"
+      },
+      {
+        "price": 704.75,
+        "label": "Lowest Support Visible",
+        "type": "support",
+        "alert": "🚨 SPY at $704.75 — Deep support. Break here confirms bearish momentum. Put thesis activating.",
+        "action": "PUT ENTRY"
+      }
+    ],
+
+    "key_patterns": {
+      "ascending_triangle": {
+        "detected": true,
+        "resistance": 712.48,
+        "support_trendline": "rising from 707.14",
+        "breakout_target": 718.00,
+        "breakdown_target": 704.75,
+        "alert": "📐 ASCENDING TRIANGLE detected on SPY 1H. Flat top at $712.48. Rising support. Breakout target $718. Breakdown target $704.75. Waiting for resolution."
+      },
+      "inside_bar": {
+        "detected": true,
+        "level": 709.05,
+        "alert": "📊 INSIDE BAR forming at $709.05. Compression before expansion. Next directional move will be significant. Watch for volume on breakout."
+      },
+      "choch": {
+        "bullish": "CHoCH+ confirmed at $708.44 premarket low — structure shifting",
+        "bearish": "CHoCH at $710.09 — watch for lower high formation",
+        "alert": "⚡ CHoCH DETECTED — Market structure changing. Confirm direction before entering."
+      }
+    },
+
+    "options_setup": {
+      "0DTE_calls": {
+        "entry_zone": "709.02 — 709.74",
+        "entry_trigger": "Bounce off $709.02 with green candle + volume",
+        "strike": "$710 call",
+        "target_1": 711.28,
+        "target_2": 712.48,
+        "stop": 708.14,
+        "max_hold_time": "2:00 PM ET",
+        "contracts": 2,
+        "budget": 400,
+        "alert": "🟢 0DTE CALL ENTRY — SPY bounced $709.02 with volume. Enter $710 call. Target $711.28 then $712.48. Stop $708.14. Exit by 2pm."
+      },
+      "0DTE_puts": {
+        "entry_zone": "712.48 — 712.92",
+        "entry_trigger": "Rejection at $712.48 with red candle + declining volume",
+        "strike": "$712 put",
+        "target_1": 710.09,
+        "target_2": 709.02,
+        "stop": 713.35,
+        "max_hold_time": "3:00 PM ET",
+        "contracts": 2,
+        "budget": 400,
+        "alert": "🔴 0DTE PUT ENTRY — SPY rejected $712.48 on weak volume. Enter $712 put. Target $710.09 then $709.02. Stop $713.35. Exit by 3pm."
+      }
+    },
+
+    "numerology": {
+      "universal_day": 2,
+      "energy": "Duality — market picks a side today",
+      "personal_day": 9,
+      "trading_edge": "Take profits fast. Exit by 3pm. Do not carry into weekend.",
+      "alert": "🔢 Day 2 energy — expect fakeout before real move. Personal Day 9 — completion. Take profits and close positions by 3pm ET."
+    }
+  }
+}

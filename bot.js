@@ -1,23 +1,46 @@
 /**
- * NumeroSage Discord Bot — SPY Level Alerts
- * Monitors SPY price and fires alerts when key levels are hit
- * Built from your TradingView chart levels
+ * NumeroSage Discord Bot — FIXED VERSION
+ * Correct Gateway Intents + Message Commands + Slash Commands
  */
 
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
+const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require("discord.js");
 const fetch = require("node-fetch");
 const levels = require("./spy_levels.json");
 
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-const CHANNEL_ID    = process.env.DISCORD_CHANNEL_ID;
+const DISCORD_TOKEN    = process.env.DISCORD_TOKEN;
+const CHANNEL_ID       = process.env.DISCORD_CHANNEL_ID;
+const CLIENT_ID        = process.env.DISCORD_CLIENT_ID;
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 
-// Track fired alerts to avoid spam
 const firedAlerts = new Set();
 let lastPrice = null;
 
-// ── PRICE FETCHER ─────────────────────────────────────────────────────────────
+const commands = [
+  new SlashCommandBuilder().setName("spy").setDescription("Live SPY price snapshot"),
+  new SlashCommandBuilder().setName("levels").setDescription("Key support and resistance levels"),
+  new SlashCommandBuilder().setName("setup").setDescription("0DTE call and put setups"),
+  new SlashCommandBuilder().setName("numerology").setDescription("Today's numerology energy"),
+  new SlashCommandBuilder().setName("brief").setDescription("Full morning brief"),
+  new SlashCommandBuilder().setName("thesis").setDescription("Bear market thesis breakdown"),
+  new SlashCommandBuilder().setName("help").setDescription("All commands and guide"),
+].map(cmd => cmd.toJSON());
+
+async function registerSlashCommands() {
+  try {
+    const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
+    await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
+    console.log("Slash commands registered.");
+  } catch (error) {
+    console.error("Slash command error:", error);
+  }
+}
 
 async function getSPYPrice() {
   try {
@@ -33,303 +56,205 @@ async function getSPYPrice() {
   }
 }
 
-// ── EMBED BUILDERS ────────────────────────────────────────────────────────────
-
-function buildResistanceEmbed(level, price) {
+function buildHelpEmbed() {
   return new EmbedBuilder()
-    .setColor(0xFF4444)
-    .setTitle(`🔴 RESISTANCE HIT — $${level.price}`)
-    .setDescription(level.alert)
+    .setColor(0x5865F2)
+    .setTitle("📋 NumeroSage Commands")
+    .setDescription("Use `/command` or `!command`")
     .addFields(
-      { name: "Level", value: `$${level.price}`, inline: true },
-      { name: "SPY Price", value: `$${price.toFixed(2)}`, inline: true },
-      { name: "Action", value: level.action, inline: true },
-      { name: "Label", value: level.label, inline: false }
+      { name: "/spy or !spy", value: "Live SPY price snapshot", inline: false },
+      { name: "/levels or !levels", value: "Key support and resistance levels", inline: false },
+      { name: "/setup or !setup", value: "0DTE call and put setups", inline: false },
+      { name: "/numerology or !numerology", value: "Today's energy reading", inline: false },
+      { name: "/brief or !brief", value: "Full morning brief", inline: false },
+      { name: "/thesis or !thesis", value: "Bear market thesis breakdown", inline: false },
+      { name: "/help or !help", value: "This menu", inline: false }
     )
     .setFooter({ text: "NumeroSage Market Intel • Not financial advice" })
     .setTimestamp();
 }
 
-function buildSupportEmbed(level, price) {
+async function buildSpyEmbed() {
+  const price = await getSPYPrice();
   return new EmbedBuilder()
-    .setColor(0x44FF44)
-    .setTitle(`🟢 SUPPORT HIT — $${level.price}`)
-    .setDescription(level.alert)
+    .setColor(0x5865F2)
+    .setTitle("📊 SPY LIVE SNAPSHOT")
     .addFields(
-      { name: "Level", value: `$${level.price}`, inline: true },
-      { name: "SPY Price", value: `$${price.toFixed(2)}`, inline: true },
-      { name: "Action", value: level.action, inline: true },
-      { name: "Label", value: level.label, inline: false }
+      { name: "Price", value: `$${price?.toFixed(2) || "N/A"}`, inline: true },
+      { name: "ATH Zone", value: "$712.92", inline: true },
+      { name: "Pattern", value: "Ascending Triangle", inline: true },
+      { name: "🔴 Resistance", value: "$713.35 — Premarket High\n$712.92 — ATH / Double Top\n$712.48 — Triangle Top\n$710.09 — DWMQ Level", inline: false },
+      { name: "🟢 Support", value: "$709.02 — $6.6B Liquidity Pool\n$708.44 — Overnight Low\n$707.28 — $4.8B Volume Node\n$705.55 — Deep Support", inline: false },
+      { name: "Bias", value: "🔴 Bearish above $712.92 | 🟢 Bullish bounce at $709.02", inline: false }
     )
     .setFooter({ text: "NumeroSage Market Intel • Not financial advice" })
     .setTimestamp();
 }
 
-function buildMorningBriefEmbed(price) {
-  const spy = levels.spy_levels;
+function buildLevelsEmbed() {
+  return new EmbedBuilder()
+    .setColor(0xF1C40F)
+    .setTitle("📐 SPY KEY LEVELS")
+    .addFields(
+      { name: "🔴 Resistance", value: "$713.35 — Premarket High\n$712.92 — Double Top / ATH\n$712.48 — Ascending Triangle Top\n$711.28 — Volume Node 32%\n$710.09 — DWMQ Confluence", inline: false },
+      { name: "🟢 Support", value: "$709.02 — $6.639B Liquidity Pool\n$708.44 — Overnight Low\n$707.28 — $4.838B Volume Node\n$706.53 — Volume Node\n$705.55 — Deep Support\n$704.75 — Breakdown Level", inline: false },
+      { name: "⚡ Key Watch", value: "Inside Bar $709.05 — compression before expansion\nBreak above $712.48 = $718 target\nBreak below $704.75 = puts activate", inline: false }
+    )
+    .setFooter({ text: "NumeroSage Market Intel • Not financial advice" })
+    .setTimestamp();
+}
+
+function buildSetupEmbed() {
+  return new EmbedBuilder()
+    .setColor(0x00FF88)
+    .setTitle("⚡ 0DTE OPTIONS SETUP")
+    .addFields(
+      { name: "🟢 CALL SETUP", value: "**Entry:** $709.02–$709.74 bounce\n**Strike:** $710 Call\n**Target 1:** $711.28\n**Target 2:** $712.48\n**Stop:** Below $708.14\n**Exit by:** 2:00 PM ET\n**Contracts:** 2 max", inline: false },
+      { name: "🔴 PUT SETUP", value: "**Entry:** $712.48–$712.92 rejection\n**Strike:** $712 Put\n**Target 1:** $710.09\n**Target 2:** $709.02\n**Stop:** Above $713.35\n**Exit by:** 3:00 PM ET\n**Contracts:** 2 max", inline: false },
+      { name: "⚠️ Rules", value: "Wait 30 min after open\nTake 50% at Target 1\nNever hold 0DTE past 3pm", inline: false }
+    )
+    .setFooter({ text: "NumeroSage Market Intel • Not financial advice" })
+    .setTimestamp();
+}
+
+function buildNumerologyEmbed() {
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  const year = today.getFullYear();
+  let yearSum = String(year).split("").reduce((a, b) => a + parseInt(b), 0);
+  while (yearSum > 9) yearSum = String(yearSum).split("").reduce((a, b) => a + parseInt(b), 0);
+  let raw = month + day + yearSum;
+  while (raw > 9 && raw !== 11 && raw !== 22 && raw !== 33) {
+    raw = String(raw).split("").reduce((a, b) => a + parseInt(b), 0);
+  }
+  const meanings = {
+    1: "Initiation — new trends begin today.",
+    2: "Duality — market picks a side. Expect fakeouts.",
+    3: "Expression — news driven volatility.",
+    4: "Structure — key levels most significant.",
+    5: "Chaos — fast reversals. Tight stops.",
+    6: "Protection — protect capital first.",
+    7: "Analysis — trust data over emotion.",
+    8: "Power — your strongest trading day.",
+    9: "Completion — take profits. Exit by 3pm.",
+    11: "Master Intuition — deception day. ATH can be traps.",
+    22: "Master Builder — major institutional moves.",
+    33: "Master Teacher — extreme moves before reversal.",
+  };
+  return new EmbedBuilder()
+    .setColor(0x9B59B6)
+    .setTitle("🔢 NUMEROLOGY DAILY ENERGY")
+    .addFields(
+      { name: `Universal Day ${raw}`, value: meanings[raw] || "Standard market day.", inline: false },
+      { name: "Life Path 8 Edge", value: "Double 8 power year — trust conviction, size responsibly.", inline: false }
+    )
+    .setFooter({ text: "NumeroSage Market Intel" })
+    .setTimestamp();
+}
+
+async function buildMorningBriefEmbed() {
+  const price = await getSPYPrice();
   return new EmbedBuilder()
     .setColor(0x9B59B6)
     .setTitle("🐻🔢 NUMEROSAGE MORNING BRIEF")
-    .setDescription(`SPY pre-market: **$${price.toFixed(2)}**`)
+    .setDescription(`SPY pre-market: **$${price?.toFixed(2) || "N/A"}**`)
     .addFields(
-      {
-        name: "🔴 Key Resistance",
-        value: `$713.35 — Premarket High\n$712.92 — ATH / Double Top\n$712.48 — Ascending Triangle top\n$710.09 — DWMQ Level`,
-        inline: false
-      },
-      {
-        name: "🟢 Key Support",
-        value: `$709.02 — $6.6B Liquidity Pool\n$708.44 — Overnight Low\n$707.28 — $4.8B Volume Node\n$705.55 — Deep Support`,
-        inline: false
-      },
-      {
-        name: "📊 Pattern",
-        value: "Ascending Triangle — flat top $712.48\nInside Bar at $709.05 — compression before expansion",
-        inline: false
-      },
-      {
-        name: "📋 0DTE Setup",
-        value: `**Calls:** Enter $709–$709.74 bounce → Strike $710 → Target $711.28 / $712.48\n**Puts:** Enter $712.48–$712.92 rejection → Strike $712 → Target $710 / $709`,
-        inline: false
-      },
-      {
-        name: "🔢 Numerology",
-        value: `Universal Day 2 — Duality\nPersonal Day 9 — Take profits, exit by 3pm`,
-        inline: false
-      }
+      { name: "🔴 Resistance", value: "$713.35 / $712.92 / $712.48 / $710.09", inline: false },
+      { name: "🟢 Support", value: "$709.02 / $708.44 / $707.28 / $705.55", inline: false },
+      { name: "📊 Pattern", value: "Ascending Triangle | Inside Bar compression", inline: false },
+      { name: "⚡ 0DTE", value: "Calls: bounce $709 → $710 strike\nPuts: reject $712.48 → $712 strike", inline: false },
+      { name: "🔢 Numerology", value: "Use !numerology for today's energy", inline: false }
     )
     .setFooter({ text: "NumeroSage Market Intel • Not financial advice" })
     .setTimestamp();
 }
 
-function buildOptionsAlertEmbed(type, setup) {
-  const isCall = type === "call";
+function buildThesisEmbed() {
   return new EmbedBuilder()
-    .setColor(isCall ? 0x00FF88 : 0xFF4444)
-    .setTitle(isCall ? "🟢 0DTE CALL ENTRY SIGNAL" : "🔴 0DTE PUT ENTRY SIGNAL")
-    .setDescription(isCall
-      ? setup["0DTE_calls"].alert
-      : setup["0DTE_puts"].alert
-    )
+    .setColor(0xFF4444)
+    .setTitle("🐻 THE BEAR MARKET THESIS")
     .addFields(
-      {
-        name: "Strike",
-        value: isCall ? setup["0DTE_calls"].strike : setup["0DTE_puts"].strike,
-        inline: true
-      },
-      {
-        name: "Target 1",
-        value: `$${isCall ? setup["0DTE_calls"].target_1 : setup["0DTE_puts"].target_1}`,
-        inline: true
-      },
-      {
-        name: "Target 2",
-        value: `$${isCall ? setup["0DTE_calls"].target_2 : setup["0DTE_puts"].target_2}`,
-        inline: true
-      },
-      {
-        name: "Stop",
-        value: `$${isCall ? setup["0DTE_calls"].stop : setup["0DTE_puts"].stop}`,
-        inline: true
-      },
-      {
-        name: "Max Hold",
-        value: isCall ? setup["0DTE_calls"].max_hold_time : setup["0DTE_puts"].max_hold_time,
-        inline: true
-      },
-      {
-        name: "Contracts",
-        value: `${isCall ? setup["0DTE_calls"].contracts : setup["0DTE_puts"].contracts} max`,
-        inline: true
-      }
+      { name: "The Jenga Theory", value: "$20.6T in passive index funds.\nGroupthink propped this market.\nWhen it sells — it sells FAST.", inline: false },
+      { name: "📉 Evidence", value: "Death cross active\nWeak high $712 ATH zone\nVolume declining on rallies\nGoldman loan losses doubled\nOil above $94 — stagflation\nConsumer sentiment near record low", inline: false },
+      { name: "🎯 Gap Targets", value: "$666 → $655 → $635 → $628", inline: false }
     )
-    .setFooter({ text: "NumeroSage Market Intel • Not financial advice" })
+    .setFooter({ text: "Protect profits. Stack dry powder. 🐻 • Not financial advice" })
     .setTimestamp();
 }
 
-// ── PRICE MONITOR ─────────────────────────────────────────────────────────────
-
-async function checkLevels(price) {
-  const channel = await client.channels.fetch(CHANNEL_ID);
-  const spy = levels.spy_levels;
-
-  // Check resistance levels
-  for (const level of spy.resistance_levels) {
-    const key = `res_${level.price}`;
-    if (firedAlerts.has(key)) continue;
-
-    const hit = lastPrice && lastPrice < level.price && price >= level.price;
-    if (hit) {
-      const embed = buildResistanceEmbed(level, price);
-      await channel.send({ embeds: [embed] });
-      firedAlerts.add(key);
-
-      // Fire options put alert at key levels
-      if (level.price === 712.48 || level.price === 712.92) {
-        const optEmbed = buildOptionsAlertEmbed("put", spy.options_setup);
-        await channel.send({ embeds: [optEmbed] });
-      }
-    }
+async function handleCommand(commandName, respond) {
+  switch (commandName) {
+    case "help": await respond({ embeds: [buildHelpEmbed()] }); break;
+    case "spy": await respond({ embeds: [await buildSpyEmbed()] }); break;
+    case "levels": await respond({ embeds: [buildLevelsEmbed()] }); break;
+    case "setup": await respond({ embeds: [buildSetupEmbed()] }); break;
+    case "numerology": await respond({ embeds: [buildNumerologyEmbed()] }); break;
+    case "brief": await respond({ embeds: [await buildMorningBriefEmbed()] }); break;
+    case "thesis": await respond({ embeds: [buildThesisEmbed()] }); break;
   }
-
-  // Check support levels
-  for (const level of spy.support_levels) {
-    const key = `sup_${level.price}`;
-    if (firedAlerts.has(key)) continue;
-
-    const hit = lastPrice && lastPrice > level.price && price <= level.price;
-    if (hit) {
-      const embed = buildSupportEmbed(level, price);
-      await channel.send({ embeds: [embed] });
-      firedAlerts.add(key);
-
-      // Fire options call alert at key bounce zones
-      if (level.price === 709.02 || level.price === 707.28) {
-        const optEmbed = buildOptionsAlertEmbed("call", spy.options_setup);
-        await channel.send({ embeds: [optEmbed] });
-      }
-    }
-  }
-
-  lastPrice = price;
 }
 
-// ── SCHEDULED JOBS ────────────────────────────────────────────────────────────
-
-async function morningBrief() {
-  const price = await getSPYPrice();
-  if (!price) return;
-  const channel = await client.channels.fetch(CHANNEL_ID);
-  const embed = buildMorningBriefEmbed(price);
-  await channel.send({ embeds: [embed] });
-}
-
-function isMarketHours() {
-  const now = new Date();
-  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
-  const h = et.getHours();
-  const m = et.getMinutes();
-  const day = et.getDay();
-  if (day === 0 || day === 6) return false;
-  if (h === 9 && m >= 30) return true;
-  if (h > 9 && h < 16) return true;
-  return false;
-}
-
-// ── BOT COMMANDS ──────────────────────────────────────────────────────────────
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+  await interaction.deferReply();
+  await handleCommand(interaction.commandName, (data) => interaction.editReply(data));
+});
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
-  const content = message.content.toLowerCase();
-
-  if (content === "!spy") {
-    const price = await getSPYPrice();
-    const spy = levels.spy_levels;
-    const embed = new EmbedBuilder()
-      .setColor(0x5865F2)
-      .setTitle("📊 SPY LIVE SNAPSHOT")
-      .addFields(
-        { name: "Price", value: `$${price?.toFixed(2) || "N/A"}`, inline: true },
-        { name: "ATH Zone", value: "$712.92", inline: true },
-        { name: "Major Support", value: "$709.02", inline: true },
-        { name: "Premarket High", value: "$713.35", inline: true },
-        { name: "Premarket Low", value: "$707.14", inline: true },
-        { name: "Pattern", value: "Ascending Triangle", inline: true },
-        { name: "Bias", value: "🔴 Bearish above $712.92", inline: false }
-      )
-      .setFooter({ text: "Not financial advice" })
-      .setTimestamp();
-    message.channel.send({ embeds: [embed] });
-  }
-
-  if (content === "!levels") {
-    const embed = new EmbedBuilder()
-      .setColor(0xF1C40F)
-      .setTitle("📐 SPY KEY LEVELS")
-      .addFields(
-        {
-          name: "🔴 Resistance",
-          value: `$713.35 — Premarket High\n$712.92 — Double Top / ATH\n$712.48 — Triangle Top\n$711.28 — Volume Node 32%\n$710.68 — Volume Node 30%`
-        },
-        {
-          name: "🟢 Support",
-          value: `$709.02 — $6.6B Liquidity\n$708.44 — Overnight Low\n$707.28 — $4.8B Volume Node\n$706.53 — Volume Node\n$705.55 — Deep Support`
-        },
-        {
-          name: "⚡ Key Levels",
-          value: `$710.09 — DWMQ Confluence (Daily/Weekly/Monthly/Quarterly)\n$709.74 — Equilibrium`
-        }
-      )
-      .setFooter({ text: "Not financial advice" })
-      .setTimestamp();
-    message.channel.send({ embeds: [embed] });
-  }
-
-  if (content === "!setup") {
-    const spy = levels.spy_levels;
-    const callEmbed = buildOptionsAlertEmbed("call", spy.options_setup);
-    const putEmbed = buildOptionsAlertEmbed("put", spy.options_setup);
-    message.channel.send({ embeds: [callEmbed] });
-    message.channel.send({ embeds: [putEmbed] });
-  }
-
-  if (content === "!numerology") {
-    const num = levels.spy_levels.numerology;
-    const embed = new EmbedBuilder()
-      .setColor(0x9B59B6)
-      .setTitle("🔢 NUMEROLOGY TODAY")
-      .addFields(
-        { name: "Universal Day", value: `${num.universal_day} — ${num.energy}`, inline: false },
-        { name: "Personal Day", value: `${num.personal_day} — ${num.trading_edge}`, inline: false }
-      )
-      .setFooter({ text: "NumeroSage Market Intel" })
-      .setTimestamp();
-    message.channel.send({ embeds: [embed] });
-  }
-
-  if (content === "!brief") {
-    await morningBrief();
-  }
-
-  if (content === "!help") {
-    const embed = new EmbedBuilder()
-      .setColor(0x5865F2)
-      .setTitle("📋 NumeroSage Commands")
-      .addFields(
-        { name: "!spy", value: "Live SPY price snapshot" },
-        { name: "!levels", value: "All key support and resistance levels" },
-        { name: "!setup", value: "0DTE call and put setups" },
-        { name: "!numerology", value: "Today's numerology energy" },
-        { name: "!brief", value: "Full morning brief" },
-        { name: "!help", value: "This menu" }
-      )
-      .setFooter({ text: "Not financial advice" })
-      .setTimestamp();
-    message.channel.send({ embeds: [embed] });
-  }
+  if (!message.content.startsWith("!")) return;
+  const commandName = message.content.slice(1).toLowerCase().trim();
+  const valid = ["help", "spy", "levels", "setup", "numerology", "brief", "thesis"];
+  if (!valid.includes(commandName)) return;
+  await handleCommand(commandName, (data) => message.channel.send(data));
 });
 
-// ── STARTUP ───────────────────────────────────────────────────────────────────
+function isMarketHours() {
+  const et = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const h = et.getHours(), m = et.getMinutes(), day = et.getDay();
+  if (day === 0 || day === 6) return false;
+  return (h === 9 && m >= 30) || (h > 9 && h < 16);
+}
 
 client.once("ready", async () => {
-  console.log(`NumeroSage Discord Bot online — ${client.user.tag}`);
-
-  // Send morning brief on startup
-  await morningBrief();
-
-  // Monitor price every 2 minutes during market hours
+  console.log(`✅ NumeroSage Discord Bot online — ${client.user.tag}`);
+  if (CLIENT_ID) await registerSlashCommands();
+  try {
+    const channel = await client.channels.fetch(CHANNEL_ID);
+    await channel.send({ embeds: [await buildMorningBriefEmbed()] });
+    console.log("Morning brief sent.");
+  } catch (e) {
+    console.error("Startup error:", e.message);
+  }
   setInterval(async () => {
     if (!isMarketHours()) return;
     const price = await getSPYPrice();
-    if (price) await checkLevels(price);
+    if (!price) return;
+    const channel = await client.channels.fetch(CHANNEL_ID);
+    for (const level of levels.spy_levels.resistance_levels) {
+      const key = `res_${level.price}`;
+      if (firedAlerts.has(key)) continue;
+      if (lastPrice && lastPrice < level.price && price >= level.price) {
+        await channel.send({ embeds: [new EmbedBuilder().setColor(0xFF4444).setTitle(`🔴 RESISTANCE — $${level.price}`).setDescription(level.alert).setTimestamp()] });
+        firedAlerts.add(key);
+      }
+    }
+    for (const level of levels.spy_levels.support_levels) {
+      const key = `sup_${level.price}`;
+      if (firedAlerts.has(key)) continue;
+      if (lastPrice && lastPrice > level.price && price <= level.price) {
+        await channel.send({ embeds: [new EmbedBuilder().setColor(0x44FF44).setTitle(`🟢 SUPPORT — $${level.price}`).setDescription(level.alert).setTimestamp()] });
+        firedAlerts.add(key);
+      }
+    }
+    lastPrice = price;
   }, 2 * 60 * 1000);
-
-  // Morning brief at 9:25am ET
   setInterval(async () => {
-    const now = new Date();
-    const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+    const et = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
     if (et.getHours() === 9 && et.getMinutes() === 25) {
-      await morningBrief();
+      const channel = await client.channels.fetch(CHANNEL_ID);
+      await channel.send({ embeds: [await buildMorningBriefEmbed()] });
     }
   }, 60 * 1000);
 });

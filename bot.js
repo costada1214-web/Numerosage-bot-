@@ -217,7 +217,8 @@ function isMarketHours() {
   return (h === 9 && m >= 30) || (h > 9 && h < 16);
 }
 
-client.once("ready", async () => {
+client.once("ready", async () => {await scheduleMay8Alerts(CHANNEL_ID, client, firedAlerts);
+
   console.log(`✅ NumeroSage Discord Bot online — ${client.user.tag}`);
   if (CLIENT_ID) await registerSlashCommands();
   try {

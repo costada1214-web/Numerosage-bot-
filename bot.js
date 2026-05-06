@@ -1,4 +1,4 @@
-/**
+const { scheduleMay8Alerts, buildNFPBriefEmbed, buildFVGLevelsEmbed, buildMay8BriefEmbed } = require("./may8_nfp");/**
  * NumeroSage Discord Bot — FIXED VERSION
  * Correct Gateway Intents + Message Commands + Slash Commands
  */
